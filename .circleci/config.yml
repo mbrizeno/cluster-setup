@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  create_cluster:
     docker:
       - image: google/cloud-sdk
     steps:
@@ -34,7 +34,7 @@ jobs:
             else
               echo "Cluster already exists"
             fi
-  deploy-istio:
+  deploy_istio:
     docker:
       - image: google/cloud-sdk
     steps:
@@ -47,3 +47,9 @@ jobs:
             curl -s -L --remote-name "https://github.com/istio/istio/releases/download/1.0.3/istio-1.0.3-linux.tar.gz"
             tar xzf "istio-1.0.3-linux.tar.gz"
             kubectl apply -f istio-1.0.3/install/kubernetes/istio-demo-auth.yaml
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - create_cluster
+      - deploy_istio
