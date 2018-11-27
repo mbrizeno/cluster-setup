@@ -36,6 +36,7 @@ jobs:
     docker:
       - image: google/cloud-sdk
     steps:
+      - checkout
       - run:
           name: Setup access
           command: |
@@ -44,20 +45,13 @@ jobs:
             gcloud --quiet config set project g-gke-clusters
             gcloud --quiet config set project us-central1-a
             gcloud container clusters get-credentials "dev-playground" --project "g-gke-clusters" --zone "us-central1-a"
-            ROLE_EXISTS=$(kubectl get clusterrolebinding | grep -o "cluster-admin-binding")
-            if [[ $ROLE_EXISTS == "" ]]; then
-              kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin \
-                --user="$(gcloud config get-value core/account)"
-            else
-              echo "cluster-admin role binding already exists"
-            fi
+            kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin \
+                --user="$(gcloud config get-value core/account)" || true
       - run:
           name: Install Istio
           command: |
             kubectl config set-context "$(kubectl config current-context)" --namespace=default
-            curl -s -L --remote-name "https://github.com/istio/istio/releases/download/1.0.3/istio-1.0.3-linux.tar.gz"
-            tar xzf istio-1.0.3-linux.tar.gz
-            kubectl apply -f istio-1.0.3/install/kubernetes/istio-demo-auth.yaml
+            kubectl apply -f istio-1.0.3/istio-demo-auth.yaml
 workflows:
   version: 2
   create_cluster_and_install_istio:
