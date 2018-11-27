@@ -5,25 +5,25 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - run:
-        name: Configure access
-        command: |
-          echo ${GCLOUD_SERVICE_KEY} > gcloud-key.json
-          gcloud auth acticate-service-account --key-file=gcloud-key.json
-          gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
-          gcloud --quiet config set project ${GOOGLE_COMPUTE_ZONE}
-          gcloud services enable "compute.googleapis.com" --project="${GOOGLE_PROJECT_ID}"
-          gcloud services enable "compute.googleapis.com" --project="${GOOGLE_PROJECT_ID}"
-          gcloud compute networks create "${CLUSTER_NAME}_NETWORK" --project "${GOOGLE_PROJECT_ID}"
+          name: Configure access
+          command: |
+            echo ${GCLOUD_SERVICE_KEY} > gcloud-key.json
+            gcloud auth acticate-service-account --key-file=gcloud-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set project ${GOOGLE_COMPUTE_ZONE}
+            gcloud services enable "compute.googleapis.com" --project="${GOOGLE_PROJECT_ID}"
+            gcloud services enable "compute.googleapis.com" --project="${GOOGLE_PROJECT_ID}"
+            gcloud compute networks create "${CLUSTER_NAME}_NETWORK" --project "${GOOGLE_PROJECT_ID}"
       - run:
-        name: Create cluster
-        command: |
-          MASTER_VERSION=$(gcloud container get-server-config --zone="${GOOGLE_COMPUTE_ZONE}" \
-            --format "value(validMasterVersions[0])" 2>/dev/null)
-          gcloud container clusters create "${CLUSTER_NAME}" \
-            --enable-autorepair \
-            --machine-type=n1-standard-2 \
-            --num-nodes=3 \
-            --network="${CLUSTER_NAME}_NETWORK" \
-            --project "${GOOGLE_PROJECT_ID}" \
-            --cluster-version="${MASTER_VERSION}" \
-            --zone "${GOOGLE_COMPUTE_ZONE}"
+          name: Create cluster
+          command: |
+            MASTER_VERSION=$(gcloud container get-server-config --zone="${GOOGLE_COMPUTE_ZONE}" \
+              --format "value(validMasterVersions[0])" 2>/dev/null)
+            gcloud container clusters create "${CLUSTER_NAME}" \
+              --enable-autorepair \
+              --machine-type=n1-standard-2 \
+              --num-nodes=3 \
+              --network="${CLUSTER_NAME}_NETWORK" \
+              --project "${GOOGLE_PROJECT_ID}" \
+              --cluster-version="${MASTER_VERSION}" \
+              --zone "${GOOGLE_COMPUTE_ZONE}"
