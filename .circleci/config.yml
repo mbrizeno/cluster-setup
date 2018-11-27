@@ -8,7 +8,7 @@ jobs:
           name: Configure access
           command: |
             echo ${GCLOUD_SERVICE_KEY} > gcloud-key.json
-            gcloud auth acticate-service-account --key-file=gcloud-key.json
+            gcloud auth activate-service-account --key-file=gcloud-key.json
             gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
             gcloud --quiet config set project ${GOOGLE_COMPUTE_ZONE}
             gcloud services enable "compute.googleapis.com" --project="${GOOGLE_PROJECT_ID}"
