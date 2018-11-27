@@ -11,8 +11,6 @@ jobs:
             gcloud auth activate-service-account --key-file=gcloud-key.json
             gcloud --quiet config set project g-gke-clusters
             gcloud --quiet config set project us-central1-a
-            gcloud services enable "compute.googleapis.com" --project="g-gke-clusters"
-            gcloud services enable "compute.googleapis.com" --project="g-gke-clusters"
             NETWORK_EXISTS=$(gcloud compute networks list --project "g-gke-clusters" --filter "name=dev-playground-network" --format "value(name)")
             if [[ $NETWORK_EXISTS == "" ]]; then
               gcloud compute networks create "dev-playground-network" --project "g-gke-clusters"
