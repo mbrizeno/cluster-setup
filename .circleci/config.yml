@@ -41,6 +41,7 @@ jobs:
       - run:
           name: Install Istio
           command: |
+            gcloud container clusters get-credentials "dev-playground" --project "g-gke-clusters" --zone "us-central1-a"
             kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin \
               --user="$(gcloud config get-value core/account)"
             kubectl config set-context "$(kubectl config current-context)" --namespace=default
