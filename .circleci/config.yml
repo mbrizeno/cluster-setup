@@ -53,5 +53,5 @@ workflows:
     jobs:
       - create_cluster
       - install_istio
-				requires:
-					- create_cluster
+        requires:
+          - create_cluster
