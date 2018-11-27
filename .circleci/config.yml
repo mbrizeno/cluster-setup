@@ -36,6 +36,7 @@ jobs:
     docker:
       - image: google/cloud-sdk
     steps:
+      - checkout
       - run:
           name: Setup access
           command: |
@@ -47,7 +48,6 @@ jobs:
             kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin \
               --user="$(gcloud config get-value core/account)"
             kubectl config set-context "$(kubectl config current-context)" --namespace=default
-      - checkout
       - run:
           name: Install Istio
           command: |
