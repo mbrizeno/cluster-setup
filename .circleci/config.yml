@@ -20,7 +20,7 @@ jobs:
       - run:
           name: Create cluster
           command: |
-            CLUSTER_EXISTS=$(gcloud container clusters list --project "istio-on-gke" --filter "name=dev-playground" --format "value(name)")
+            CLUSTER_EXISTS=$(gcloud container clusters list --project "g-gke-clusters" --filter "name=dev-playground" --format "value(name)")
             if [[$CLUSTER_EXISTS == ""]]; then
               gcloud container clusters create "dev-playground" \
                 --enable-autorepair \
