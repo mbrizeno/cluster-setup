@@ -34,7 +34,7 @@ jobs:
             else
               echo "Cluster already exists"
             fi
-  deploy_istio:
+  install_istio:
     docker:
       - image: google/cloud-sdk
     steps:
@@ -49,7 +49,9 @@ jobs:
             kubectl apply -f istio-1.0.3/install/kubernetes/istio-demo-auth.yaml
 workflows:
   version: 2
-  build_and_deploy:
+  create_cluster_and_install_istio:
     jobs:
       - create_cluster
-      - deploy_istio
+      - install_istio
+				requires:
+					- create_cluster
