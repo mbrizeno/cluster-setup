@@ -26,7 +26,7 @@ jobs:
             if [[ $CLUSTER_EXISTS == "" ]]; then
               gcloud container clusters create "dev-playground" \
                 --enable-autorepair \
-                --machine-type=n1-standard-2 \
+                --machine-type=n1-standard-1 \
                 --num-nodes=3 \
                 --network="dev-playground-network" \
                 --project "g-gke-clusters" \
