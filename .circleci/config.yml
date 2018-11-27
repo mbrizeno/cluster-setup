@@ -46,7 +46,7 @@ jobs:
             gcloud --quiet config set project us-central1-a
             gcloud container clusters get-credentials "dev-playground" --project "g-gke-clusters" --zone "us-central1-a"
             ROLE_EXISTS=$(kubectl get clusterrolebinding | grep -E "^cluster-admin\s")
-            if [[ ROLE_EXISTS == "" ]]; then
+            if [[ $ROLE_EXISTS == "" ]]; then
               kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin \
                 --user="$(gcloud config get-value core/account)"
             else
