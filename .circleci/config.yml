@@ -4,7 +4,6 @@ jobs:
     docker:
       - image: google/cloud-sdk
     steps:
-      - configure_project:
       - run: |
           echo $GCLOUD_SERVICE_KEY > gcloud-key.json
           gcloud auth activate-service-account --key-file=gcloud-key.json
