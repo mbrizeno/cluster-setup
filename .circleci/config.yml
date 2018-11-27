@@ -14,14 +14,16 @@ jobs:
             gcloud services enable "compute.googleapis.com" --project="g-gke-clusters"
             gcloud services enable "compute.googleapis.com" --project="g-gke-clusters"
             NETWORK_EXISTS=$(gcloud compute networks list --project "g-gke-clusters" --filter "name=dev-playground-network" --format "value(name)")
-            if [[$NETWORK_EXISTS == "" ]]; then
+            if [[ $NETWORK_EXISTS == "" ]]; then
               gcloud compute networks create "dev-playground-network" --project "g-gke-clusters"
+            else
+              echo "Network already exists"
             fi
       - run:
           name: Create cluster
           command: |
             CLUSTER_EXISTS=$(gcloud container clusters list --project "g-gke-clusters" --filter "name=dev-playground" --format "value(name)")
-            if [[$CLUSTER_EXISTS == ""]]; then
+            if [[ $CLUSTER_EXISTS == "" ]]; then
               gcloud container clusters create "dev-playground" \
                 --enable-autorepair \
                 --machine-type=n1-standard-2 \
@@ -29,4 +31,6 @@ jobs:
                 --network="dev-playground-network" \
                 --project "g-gke-clusters" \
                 --zone "us-central1-a"
+            else
+              echo "Cluster already exists"
             fi
