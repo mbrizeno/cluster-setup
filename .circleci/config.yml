@@ -47,6 +47,7 @@ jobs:
             kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin \
               --user="$(gcloud config get-value core/account)"
             kubectl config set-context "$(kubectl config current-context)" --namespace=default
+      - run:
           name: Install Istio
           command: |
             curl -s -L --remote-name "https://github.com/istio/istio/releases/download/1.0.3/istio-1.0.3-linux.tar.gz"
