@@ -11,26 +11,24 @@ jobs:
             gcloud auth activate-service-account --key-file=gcloud-key.json
             gcloud --quiet config set project g-gke-clusters
             gcloud --quiet config set project us-central1-a
-            gcloud services enable "compute.googleapis.com" --project="g-gke-clusters"
-            gcloud services enable "compute.googleapis.com" --project="g-gke-clusters"
-            NETWORK_EXISTS=$(gcloud compute networks list --project "g-gke-clusters" --filter "name=dev-playground-network" --format "value(name)")
+            gcloud services enable "compute.googleapis.com"
+            gcloud services enable "compute.googleapis.com"
+            NETWORK_EXISTS=$(gcloud compute networks list --filter "name=dev-playground-network" --format "value(name)")
             if [[ $NETWORK_EXISTS == "" ]]; then
-              gcloud compute networks create "dev-playground-network" --project "g-gke-clusters"
+              gcloud compute networks create "dev-playground-network"
             else
               echo "Network already exists"
             fi
       - run:
           name: Create cluster
           command: |
-            CLUSTER_EXISTS=$(gcloud container clusters list --project "g-gke-clusters" --filter "name=dev-playground" --format "value(name)")
+            CLUSTER_EXISTS=$(gcloud container clusters list --filter "name=dev-playground" --format "value(name)")
             if [[ $CLUSTER_EXISTS == "" ]]; then
               gcloud container clusters create "dev-playground" \
                 --enable-autorepair \
                 --machine-type=n1-standard-2 \
                 --num-nodes=3 \
                 --network="dev-playground-network" \
-                --project "g-gke-clusters" \
-                --zone "us-central1-a"
             else
               echo "Cluster already exists"
             fi
@@ -39,12 +37,18 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - run:
-          name: Install Istio
+          name: Setup access
           command: |
-            gcloud container clusters get-credentials "dev-playground" --project "g-gke-clusters" --zone "us-central1-a"
+            echo ${GCLOUD_SERVICE_KEY} > gcloud-key.json
+            gcloud auth activate-service-account --key-file=gcloud-key.json
+            gcloud --quiet config set project g-gke-clusters
+            gcloud --quiet config set project us-central1-a
+            gcloud container clusters get-credentials "dev-playground"
             kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin \
               --user="$(gcloud config get-value core/account)"
             kubectl config set-context "$(kubectl config current-context)" --namespace=default
+          name: Install Istio
+          command: |
             curl -s -L --remote-name "https://github.com/istio/istio/releases/download/1.0.3/istio-1.0.3-linux.tar.gz"
             tar xzf "istio-1.0.3-linux.tar.gz"
             kubectl apply -f istio-1.0.3/install/kubernetes/istio-demo-auth.yaml
