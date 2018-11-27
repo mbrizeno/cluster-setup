@@ -34,3 +34,16 @@ jobs:
             else
               echo "Cluster already exists"
             fi
+  deploy-istio:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - run:
+          name: Install Istio
+          command: |
+            kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin \
+              --user="$(gcloud config get-value core/account)"
+            kubectl config set-context "$(kubectl config current-context)" --namespace=default
+            curl -s -L --remote-name "https://github.com/istio/istio/releases/download/1.0.3/istio-1.0.3-linux.tar.gz"
+            tar xzf "istio-1.0.3-linux.tar.gz"
+            kubectl apply -f istio-1.0.3/install/kubernetes/istio-demo-auth.yaml
