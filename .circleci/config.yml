@@ -4,28 +4,26 @@ jobs:
     docker:
       - image: google/cloud-sdk
     steps:
+      - checkout
       - run:
-          name: Configure access
+          name: Create cluster (if needed)
           command: |
             echo ${GCLOUD_SERVICE_KEY} > gcloud-key.json
             gcloud auth activate-service-account --key-file=gcloud-key.json
-            gcloud --quiet config set project g-gke-clusters
-            gcloud --quiet config set project us-central1-a
-            NETWORK_EXISTS=$(gcloud compute networks list --project "g-gke-clusters" --filter "name=dev-playground-network" --format "value(name)")
-            if [[ $NETWORK_EXISTS == "" ]]; then
-              gcloud compute networks create "dev-playground-network" --project "g-gke-clusters"
-            else
-              echo "Network already exists"
-            fi
-      - run:
-          name: Create cluster
-          command: |
+
+            #Check if cluster exists
             CLUSTER_EXISTS=$(gcloud container clusters list --project "g-gke-clusters" --filter "name=dev-playground" --format "value(name)")
             if [[ $CLUSTER_EXISTS == "" ]]; then
+              NETWORK_EXISTS=$(gcloud compute networks list --project "g-gke-clusters" --filter "name=dev-playground-network" --format "value(name)")
+              if [[ $NETWORK_EXISTS == "" ]]; then
+                gcloud compute networks create "dev-playground-network" --project "g-gke-clusters"
+              else
+                echo "Network already exists"
+              fi
               gcloud container clusters create "dev-playground" \
                 --enable-autorepair \
                 --machine-type=n1-standard-1 \
-                --num-nodes=3 \
+                --num-nodes=4 \
                 --network="dev-playground-network" \
                 --project "g-gke-clusters" \
                 --zone "us-central1-a"
@@ -45,6 +43,7 @@ jobs:
             gcloud --quiet config set project g-gke-clusters
             gcloud --quiet config set project us-central1-a
             gcloud container clusters get-credentials "dev-playground" --project "g-gke-clusters" --zone "us-central1-a"
+            # Ignore error if role binding already exists with || true
             kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin \
                 --user="$(gcloud config get-value core/account)" || true
       - run:
@@ -54,7 +53,7 @@ jobs:
             kubectl apply -f istio-1.0.3/istio-demo-auth.yaml
 workflows:
   version: 2
-  create_cluster_and_install_istio:
+  install_istio:
     jobs:
       - create_cluster
       - install_istio:
