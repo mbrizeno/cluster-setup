@@ -40,8 +40,6 @@ jobs:
           command: |
             echo ${GCLOUD_SERVICE_KEY} > gcloud-key.json
             gcloud auth activate-service-account --key-file=gcloud-key.json
-            gcloud --quiet config set project g-gke-clusters
-            gcloud --quiet config set project us-central1-a
             gcloud container clusters get-credentials "dev-playground" --project "g-gke-clusters" --zone "us-central1-a"
             # Ignore error if role binding already exists with || true
             kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin \
